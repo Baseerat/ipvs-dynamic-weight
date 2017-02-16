@@ -11,6 +11,7 @@ if len(sys.argv) < 3:
                     'along with a timeout value for probing the state')
 
 mc = memcache.Client([sys.argv[1]], )
+
 timeout = float(sys.argv[2])
 debug = len(sys.argv) > 3
 
