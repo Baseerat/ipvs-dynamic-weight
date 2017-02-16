@@ -28,7 +28,7 @@ while True:
     weight = int(((255 / max_load) * ((max_load + 0.001) - load)) + 1)
 
     if len(sys.argv) > 3:
-        print 'Declaring weight of %s for %s for %ss, given load of %s' % (weight, server_id, 60 * 2, load)
+        print 'Declaring weight of %s for %s for %ss, given load of %s' % (weight, server_id, timeout, load)
 
     mc.set('server-weight-%s' % server_id, weight, time=60 * 2)  # Set a two minute expiry
     time.sleep(timeout)
