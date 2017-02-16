@@ -19,7 +19,7 @@ while True:
         weight = mc.get('server-weight-%s' % server_id, )
         if not weight:
             continue
-        script = "sudo ipvsadm -e -t XXX:8080 -r YYY.%s:8080 -w %s" % (server_id, weight)
+        script = "sudo ipvsadm -e -t XXX:8080 -r YYY%s:8080 -w %s" % (server_id, weight)
         if debug: print '  - Running [%s]' % (script,)
         commands.getstatusoutput(script)
     time.sleep(timeout)
