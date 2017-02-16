@@ -37,7 +37,7 @@ while True:
             load = max_load
 
         weight = int(((255 / max_load) * ((max_load + 0.001) - load)) + 1)
-    else:
+    elif metric == 'cpu':
         usage = psutil.cpu_times()
         idle_usage = usage.idle
         total_usage = usage.idle + usage.user + usage.system
@@ -48,6 +48,8 @@ while True:
 
         last_idle_usage = idle_usage
         last_total_usage = total_usage
+    else:
+        pass
 
     if debug == 'True':
         print 'Declaring weight of %s for %s for %ss' % (weight, server_id, 60 * 2)
