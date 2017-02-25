@@ -21,8 +21,9 @@ metric = sys.argv[4]
 if metric == 'loadavg':
     max_load = int(sys.argv[5])
 
-last_total_usage = 0
-last_idle_usage = 0
+last_idle = 0
+last_total = 0
+last_weight = 0
 
 while True:
     weight = 1
@@ -37,17 +38,24 @@ while True:
             load = max_load
 
         weight = int(((255 / max_load) * ((max_load + 0.001) - load)) + 1)
-    elif metric == 'cpu':
-        usage = psutil.cpu_times()
-        idle_usage = usage.idle
-        total_usage = usage.idle + usage.user + usage.system
 
-        weight = int(100.0 * (idle_usage - last_idle_usage) / (total_usage - last_total_usage))
+    elif metric == 'cpu':
+        stats = psutil.cpu_times()
+        idle = stats.idle
+        usage = stats.user + stats.system + stats.nice + stats.irq + stats.softirq
+        total = idle + usage
+
+        if (total - last_total) == 0:
+            weight = last_weight
+        else:
+            weight = int(100.0 * (idle - last_idle) / (total - last_total))
 
         if weight == 0: weight = 1
 
-        last_idle_usage = idle_usage
-        last_total_usage = total_usage
+        last_idle = idle
+        last_total = total
+        last_weight = weight
+
     else:
         pass
 
