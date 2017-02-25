@@ -2,7 +2,7 @@
 
 import os, socket, sys, commands, memcache, time
 
-#TODO: handle multiple sites.
+# TODO: handle multiple sites.
 
 server_ids = [_SERVER_IDS_]
 
@@ -21,6 +21,6 @@ while True:
         if not weight:
             continue
         script = "sudo ipvsadm -e -t XXX:8080 -r YYY%s:8080 -w %s" % (server_id, weight)
-        if debug: print '  - Running [%s]' % (script,)
+        # if debug: print '  - Running [%s]' % (script,)
         commands.getstatusoutput(script)
     time.sleep(timeout)
