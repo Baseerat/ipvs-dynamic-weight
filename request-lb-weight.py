@@ -44,9 +44,9 @@ while True:
         idle_usage = int(usage[5])
         total_usage = idle_usage + int(usage[2]) + int(usage[4])
 
-        if (total_usage - last_total_usage) != 0:
-            weight = int(100.0 * (idle_usage - last_idle_usage) / (total_usage - last_total_usage))
-            if weight == 0: weight = 1
+        weight = int(100.0 * (idle_usage - last_idle_usage) / (total_usage - last_total_usage))
+
+        if weight == 0: weight = 1
 
         last_idle_usage = idle_usage
         last_total_usage = total_usage
