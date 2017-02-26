@@ -7,8 +7,6 @@ import os, sys, memcache, time, psutil
 # will see a lot of jerkiness. So we take the 5 minute average.
 # This means servers get lowered in priority more slowly.
 server_id = _SERVER_ID_
-alpha_value = _ALPHA_VALUE_
-inv_alpha_value = 1 - alpha_value
 
 if len(sys.argv) < 4:
     raise Exception('You must pass the hostname and port of your memcached server, '
@@ -41,6 +39,8 @@ if metric == 'loadavg':
         time.sleep(timeout)
 
 elif metric == 'cpu':
+    alpha_value = _ALPHA_VALUE_
+    inv_alpha_value = 1 - alpha_value
     weight = None
 
     while True:
