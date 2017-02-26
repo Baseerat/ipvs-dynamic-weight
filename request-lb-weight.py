@@ -49,12 +49,12 @@ elif metric == 'cpu':
         usage = stats.user + stats.system + stats.nice + stats.irq + stats.softirq
         total = idle + usage
 
-        util = int(100.0 * idle / total)
+        util = 100.0 * idle / total
 
         if not weight:
-            weight = util
+            weight = int(util)
         else:
-            weight = (alpha_value * util) + (inv_alpha_value * weight)
+            weight = int((alpha_value * util) + (inv_alpha_value * weight))
 
         if debug == 'True':
             print 'Declaring weight of %s for %s for %ss' % (weight, server_id, 60 * 2)
