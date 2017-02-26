@@ -46,16 +46,21 @@ elif metric == 'cpu':
     def get_stats():
         _stats = psutil.cpu_times()
         _idle = _stats.idle
-        _total = idle + (_stats.user + _stats.system + _stats.nice + _stats.irq + _stats.softirq)
+        _total = _idle + (_stats.user + _stats.system + _stats.nice + _stats.irq + _stats.softirq)
         return _idle, _total
 
 
     last_idle, last_total = get_stats()
+    last_util = 100.0 * last_idle / last_total
     weight = None
 
     while True:
         idle, total = get_stats()
-        util = 100.0 * (idle - last_idle) / (total - last_total)
+
+        if (total - last_total) == 0:
+            util = last_util
+        else:
+            util = 100.0 * (idle - last_idle) / (total - last_total)
 
         if not weight:
             weight = int(util)
