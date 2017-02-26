@@ -51,7 +51,7 @@ elif metric == 'cpu':
 
 
     last_idle, last_total = get_stats()
-    util = 100.0 * last_idle / last_total
+    util = 100 - psutil.cpu_percent(interval=0.1)
     weight = int(util)
 
     while True:
