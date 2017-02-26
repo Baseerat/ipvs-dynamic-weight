@@ -39,7 +39,7 @@ if metric == 'loadavg':
         time.sleep(timeout)
 
 elif metric == 'cpu':
-    alpha_value = _ALPHA_VALUE_
+    alpha_value = float(sys.argv[5])
     inv_alpha_value = 1 - alpha_value
     weight = None
 
