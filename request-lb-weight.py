@@ -41,15 +41,21 @@ if metric == 'loadavg':
 elif metric == 'cpu':
     alpha_value = float(sys.argv[5])
     inv_alpha_value = 1 - alpha_value
+
+
+    def get_stats():
+        _stats = psutil.cpu_times()
+        _idle = _stats.idle
+        _total = idle + (_stats.user + _stats.system + _stats.nice + _stats.irq + _stats.softirq)
+        return _idle, _total
+
+
+    last_idle, last_total = get_stats()
     weight = None
 
     while True:
-        stats = psutil.cpu_times()
-        idle = stats.idle
-        usage = stats.user + stats.system + stats.nice + stats.irq + stats.softirq
-        total = idle + usage
-
-        util = 100.0 * idle / total
+        idle, total = get_stats()
+        util = 100.0 * (idle - last_idle) / (total - last_total)
 
         if not weight:
             weight = int(util)
