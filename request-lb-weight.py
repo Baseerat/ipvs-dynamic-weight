@@ -51,27 +51,21 @@ elif metric == 'cpu':
 
 
     last_idle, last_total = get_stats()
-    last_util = 100.0 * last_idle / last_total
-    weight = None
+    util = 100.0 * last_idle / last_total
+    weight = int(util)
 
     while True:
         idle, total = get_stats()
 
-        if (total - last_total) == 0:
-            util = last_util
-        else:
+        if (total - last_total) != 0:
             util = 100.0 * (idle - last_idle) / (total - last_total)
 
-        if not weight:
-            weight = int(util)
-        else:
-            weight = int((alpha_value * util) + (inv_alpha_value * weight))
+        weight = int((alpha_value * util) + (inv_alpha_value * weight))
 
         if debug == 'True':
             print 'Declaring weight of %s for %s for %ss' % (weight, server_id, 60 * 2)
 
-        last_idle = idle
-        last_total = total
+        last_idle, last_total = idle, total
 
         mc.set('server-weight-%s' % server_id, weight, time=60 * 2)  # Set a two minute expiry
         time.sleep(timeout)
