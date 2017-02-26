@@ -70,5 +70,8 @@ elif metric == 'cpu':
         if debug == 'True':
             print 'Declaring weight of %s for %s for %ss' % (weight, server_id, 60 * 2)
 
+        last_idle = idle
+        last_total = total
+
         mc.set('server-weight-%s' % server_id, weight, time=60 * 2)  # Set a two minute expiry
         time.sleep(timeout)
