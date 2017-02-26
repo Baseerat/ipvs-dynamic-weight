@@ -7,6 +7,8 @@ import os, sys, memcache, time, psutil
 # will see a lot of jerkiness. So we take the 5 minute average.
 # This means servers get lowered in priority more slowly.
 server_id = _SERVER_ID_
+alpha_value = _ALPHA_VALUE_
+inv_alpha_value = 1 - alpha_value
 
 if len(sys.argv) < 4:
     raise Exception('You must pass the hostname and port of your memcached server, '
@@ -21,14 +23,7 @@ metric = sys.argv[4]
 if metric == 'loadavg':
     max_load = int(sys.argv[5])
 
-last_idle = 0
-last_total = 0
-last_weight = 0
-
-while True:
-    weight = 1
-
-    if metric == 'loadavg':
+    while True:
         load = os.getloadavg()[1]
 
         # Weight must range from 1 - 256
@@ -39,27 +34,30 @@ while True:
 
         weight = int(((255 / max_load) * ((max_load + 0.001) - load)) + 1)
 
-    elif metric == 'cpu':
+        if debug == 'True':
+            print 'Declaring weight of %s for %s for %ss' % (weight, server_id, 60 * 2)
+
+        mc.set('server-weight-%s' % server_id, weight, time=60 * 2)  # Set a two minute expiry
+        time.sleep(timeout)
+
+elif metric == 'cpu':
+    weight = None
+
+    while True:
         stats = psutil.cpu_times()
         idle = stats.idle
         usage = stats.user + stats.system + stats.nice + stats.irq + stats.softirq
         total = idle + usage
 
-        if (total - last_total) == 0:
-            weight = last_weight
+        util = int(100.0 * idle / total)
+
+        if not weight:
+            weight = util
         else:
-            weight = int(100.0 * (idle - last_idle) / (total - last_total))
+            weight = (alpha_value * util) + (inv_alpha_value * weight)
 
-        if weight == 0: weight = 1
+        if debug == 'True':
+            print 'Declaring weight of %s for %s for %ss' % (weight, server_id, 60 * 2)
 
-        last_idle = idle
-        last_total = total
-        last_weight = weight
-
-    else:
-        pass
-
-    if debug == 'True':
-        print 'Declaring weight of %s for %s for %ss' % (weight, server_id, 60 * 2)
-    mc.set('server-weight-%s' % server_id, weight, time=60 * 2)  # Set a two minute expiry
-    time.sleep(timeout)
+        mc.set('server-weight-%s' % server_id, weight, time=60 * 2)  # Set a two minute expiry
+        time.sleep(timeout)
