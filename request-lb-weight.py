@@ -63,6 +63,7 @@ elif metric == 'cpu':
         weight = int((alpha_value * util) + (inv_alpha_value * weight))
         if weight == 0:
             weight = 1
+        # else: weight = 1
 
         if debug == 'True':
             print 'Declaring weight of %s for %s for %ss' % (weight, server_id, 60 * 2)
