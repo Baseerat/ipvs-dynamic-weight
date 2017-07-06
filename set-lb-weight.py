@@ -4,23 +4,25 @@ import os, socket, sys, commands, memcache, time
 
 #TODO: handle multiple sites.
 
-server_ids = [_SERVER_IDS_]
-
-if len(sys.argv) < 3:
-    raise Exception('You must pass the hostname and port of your memcached server, '
+if len(sys.argv) < 7:
+    raise Exception('You must pass the host ip addresses, and hostname and port of your memcached server, '
                     'along with a timeout value for probing the state')
 
-mc = memcache.Client([sys.argv[1]], )
-
-timeout = float(sys.argv[2])
-debug = len(sys.argv) > 3
+server_addresses_string = sys.argv[1]
+server_addresses = server_addresses_string.split(',')
+server_port = sys.argv[2]
+mc = memcache.Client([sys.argv[3]],)
+timeout = float(sys.argv[4])
+service_address = sys.argv[5]
+service_port = sys.argv[6]
+debug = len(sys.argv) > 7
 
 while True:
-    for server_id in server_ids:
-        weight = mc.get('server-weight-%s' % server_id, )
+    for server_address in server_addresses:
+        weight = mc.get('%s-weight' % server_address,)
         if not weight:
             continue
-        script = "sudo ipvsadm -e -t XXX:8080 -r YYY%s:8080 -w %s" % (server_id, weight)
+        script = "sudo ipvsadm -e -t %s:%s -r %s:%s -w %s" % (service_address, service_port, server_address, server_port, weight)
         if debug: print '  - Running [%s]' % (script,)
         commands.getstatusoutput(script)
     time.sleep(timeout)
