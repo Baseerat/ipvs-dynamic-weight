@@ -15,13 +15,16 @@ mc = memcache.Client([sys.argv[3]],)
 timeout = float(sys.argv[4])
 service_address = sys.argv[5]
 service_port = sys.argv[6]
-debug = len(sys.argv) > 7
+enable = sys.argv[7]
+debug = len(sys.argv) > 8
 
 while True:
     for server_address in server_addresses:
         weight = mc.get('%s-weight' % server_address,)
         if not weight:
             continue
+        if not enable:
+            weight = 1
         script = "sudo ipvsadm -e -t %s:%s -r %s:%s -m -w %s" % (service_address, service_port, server_address, server_port, weight)
         if debug: print '  - Running [%s]' % (script,)
         commands.getstatusoutput(script)
